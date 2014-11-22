@@ -1,7 +1,7 @@
 // create a kafkaesqe client, providing at least one broker
 var kafkaesque = require('kafkaesque')({
-  brokers: [{host: 'localhost', port: 9092}],
-  clientId: 'MrFlibble',
+  brokers: [{host: 'kafka', port: 9092}],
+  clientId: 'node-producer',
   maxBytes: 2000000
 });
 
