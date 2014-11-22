@@ -17,4 +17,5 @@ kafkaesque.tearUp(function() {
     kafkaesque.tearDown();
   });
 });
-*/
+*/	
+while(true){};
