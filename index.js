@@ -5,6 +5,7 @@ var kafkaesque = require('kafkaesque')({
   maxBytes: 2000000
 });
 
+/*
 // tearup the client
 kafkaesque.tearUp(function() {
   // send two messages to the testing topic
@@ -16,3 +17,4 @@ kafkaesque.tearUp(function() {
     kafkaesque.tearDown();
   });
 });
+*/
