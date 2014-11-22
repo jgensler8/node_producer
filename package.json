@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/jgensler8/node_producer",
   "dependencies": {
-    "kafka-node": "^0.2.11"
+    "prozess": "^0.7.3"
   }
 }

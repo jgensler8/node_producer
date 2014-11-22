@@ -1,14 +1,24 @@
-var kafka = require('kafka-node'),
-    Producer = kafka.Producer,
-    client = new kafka.Client("zookeeper:2182/kafka0.8", "kafka-node-client", {});
-    producer = new Producer(client),
-    payloads = [
-        { topic: 'fridge', messages: "{'temp':50, 'mopened': [1,3], 'tOpened': 12, 'tClosed': 14}" },
-        { topic: 'fridge', messages: "{'temp':45, 'mopened': [1,4], 'tOpened': 12, 'tClosed': 14}" },
-    ];
+var Producer = require('prozess').Producer;
 
-producer.on('ready', function () {
-    producer.send(payloads, function (err, data) {
-        console.log(data);
-    });
+var producer = new Producer('fridge', {host : 'zookeeper'});
+producer.connect();
+console.log("producing for ", producer.topic);
+
+producer.on('error', function(err){
+  console.log("some general error occurred: ", err);  
 });
+producer.on('brokerReconnectError', function(err){
+  console.log("could not reconnect: ", err);  
+  console.log("will retry on next send()");  
+});
+
+setInterval(function(){
+  var message = { "date" :  new Date() };
+  producer.send(JSON.stringify(message), function(err){
+    if (err){
+      console.log("send error: ", err);
+    } else {
+      console.log("message sent");
+    }
+  });
+}, 1000);
