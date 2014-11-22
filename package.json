@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/jgensler8/node_producer",
   "dependencies": {
-    "prozess": "^0.7.3"
+    "kafkaesque": "^0.1.1"
   }
 }

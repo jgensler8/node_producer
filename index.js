@@ -1,24 +1,18 @@
-var Producer = require('prozess').Producer;
-
-var producer = new Producer('fridge', {host : 'zookeeper'});
-producer.connect();
-console.log("producing for ", producer.topic);
-
-producer.on('error', function(err){
-  console.log("some general error occurred: ", err);  
-});
-producer.on('brokerReconnectError', function(err){
-  console.log("could not reconnect: ", err);  
-  console.log("will retry on next send()");  
+// create a kafkaesqe client, providing at least one broker
+var kafkaesque = require('kafkaesque')({
+  brokers: [{host: 'localhost', port: 9092}],
+  clientId: 'MrFlibble',
+  maxBytes: 2000000
 });
 
-setInterval(function(){
-  var message = { "date" :  new Date() };
-  producer.send(JSON.stringify(message), function(err){
-    if (err){
-      console.log("send error: ", err);
-    } else {
-      console.log("message sent");
-    }
+// tearup the client
+kafkaesque.tearUp(function() {
+  // send two messages to the testing topic
+  kafkaesque.produce({topic: 'testing', partition: 0}, 
+                     ['wotcher mush', 'orwlight geezer'], 
+                     function(err, response) {
+    // shutdown connection
+    console.log(response);
+    kafkaesque.tearDown();
   });
-}, 1000);
+});
