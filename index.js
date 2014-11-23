@@ -22,7 +22,19 @@ var kafkaesque = require('kafkaesque')({
 function sendData()
 {
   // read data from serial
-  var data = {temp: ((Math.random()+100) % 100)};
+  var data = {
+	open: ((Math.random()+100)%2),
+	temp: ((Math.random()+100) % 100),
+        dispensers:
+        {
+          "0": ((Math.random()+100)%2),
+          "1": ((Math.random()+100)%2),
+          "2": ((Math.random()+100)%2),
+          "3": ((Math.random()+100)%2),
+          "4": ((Math.random()+100)%2),
+          "5": ((Math.random()+100)%2)
+        }
+  };
 
   // send data over to kafka
   kafkaesque.produce({topic: 'fridge', partition: 0},
