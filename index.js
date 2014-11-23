@@ -19,9 +19,8 @@ var kafkaesque = require('kafkaesque')({
   maxBytes: 2000000
 });
 
-// tearup the client
-kafkaesque.tearUp(function() {
-  setTimeout(function(){
+function sendData()
+{
   // read data from serial
   var data = {temp: ((Math.random()+100) % 100)};
 
@@ -34,10 +33,10 @@ kafkaesque.tearUp(function() {
     {
       console.log("err", err);
       kafkaesque.tearDown();
-      return;
     }
     // shutdown connection
     console.log("response:", response);
   });
- }, 1000);
-});
+}
+
+kafkaesque.tearUp( function(){ setInterval(sendData, 1000*1); });
