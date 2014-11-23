@@ -7,9 +7,11 @@ commander
   .option('-kp, --kafka-port [n]', 'Kafka port to cionnect to.', parseInt)
   .parse(process.argv);
 
+console.log(commander.kafkaDomain, commander.kafkaPort, commander.id);
+
 // create a kafkaesqe client, providing at least one broker
 var kafkaesque = require('kafkaesque')({
-  brokers: [{host: commander.kafka | 'kafka', port: commander.port | 9092}],
+  brokers: [{host: commander.kafkaDomain | 'kafka', port: commander.kafkaPort | 9092}],
   clientId: commander.id | "node-producer",
   maxBytes: 2000000
 });
