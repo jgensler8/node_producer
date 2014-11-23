@@ -16,9 +16,9 @@ var kafkaesque = require('kafkaesque')({
 
 // tearup the client
 kafkaesque.tearUp(function() {
-  setTimeout({
+  setTimeout(function(){
   // read data from serial
-  var data = {temp: (Math.rand()+100) % 100};
+  var data = {temp: ((Math.rand()+100) % 100)};
 
   // send data over to kafka
   kafkaesque.produce({topic: 'fridge', partition: 0},
