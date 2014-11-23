@@ -8,7 +8,7 @@ commander
   .parse(process.argv);
 
 console.log(commander.kafkaDomain, commander.kafkaPort, commander.id);
-if(commander.id === undefined) commander.id = ((Math.rand() + 10000000) % 10000000);
+if(commander.id === undefined) commander.id = ((Math.random() + 10000000) % 10000000);
 if(commander.kafkaDomain === undefined) commander.kafkaDomain = 'kafka';
 if(commander.kafkaPort === undefined) commander.kafkaPort = 9092;
 
