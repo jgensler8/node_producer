@@ -9,10 +9,12 @@ commander
 
 console.log(commander.kafkaDomain, commander.kafkaPort, commander.id);
 if(commander.id === undefined) commander.id = ((Math.rand() + 10000000) % 10000000);
+if(commander.kafkaDomain === undefined) commander.kafkaDomain = 'kafka';
+if(commander.kafkaPort === undefined) commander.kafkaPort = 9092;
 
 // create a kafkaesqe client, providing at least one broker
 var kafkaesque = require('kafkaesque')({
-  brokers: [{host: commander.kafkaDomain | 'kafka', port: commander.kafkaPort | 9092}],
+  brokers: [{host: commander.kafkaDomain, port: commander.kafkaPort}],
   clientId: "node-producer-" + commander.id,
   maxBytes: 2000000
 });
