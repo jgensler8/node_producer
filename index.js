@@ -27,7 +27,7 @@ kafkaesque.tearUp(function() {
 
   // send data over to kafka
   kafkaesque.produce({topic: 'fridge', partition: 0},
-                     [data.stringify()],
+                     [JSON.stringify(data)],
                      function(err, response) {
 
     if(err)
