@@ -1,17 +1,25 @@
 var commander = require('commander');
+var http = require('http');
 
 commander
   .version('0.0.1')
+  .option('-s, --unix-socket [value]', 'set the UNIX socket to write to')
   .option('-id, --id [value]', 'ID for this producer')
   .option('-kh, --kafka-domain [value]', 'iKafka idomain to connect to.')
   .option('-kp, --kafka-port [n]', 'Kafka port to cionnect to.', parseInt)
-  .option('-emu, --emulated', 'Run in emulated mode (no serial reading, random data)')
+  .option('-emu, --emulated', 'Run in emulated mode (no socket reading, random data)')
+  .option('-m, --ms-send [n]', 'Send a message arg amount of milliseconds', parseInt)
   .parse(process.argv);
 
-console.log(commander.kafkaDomain, commander.kafkaPort, commander.id);
 if(commander.id === undefined) commander.id = ((Math.random() + 10000000) % 10000000);
 if(commander.kafkaDomain === undefined) commander.kafkaDomain = 'kafka';
 if(commander.kafkaPort === undefined) commander.kafkaPort = 9092;
+if(!commander.emulated && commander.unixSocket === undefined)
+{
+  console.log("ERROR: emualted set but no unixSocket specified");
+  return -1;
+}
+if(commander.msSend === undefined) commander.msSend = 1000*1; //one second
 
 // create a kafkaesqe client, providing at least one broker
 var kafkaesque = require('kafkaesque')({
@@ -20,9 +28,11 @@ var kafkaesque = require('kafkaesque')({
   maxBytes: 2000000
 });
 
-function sendSerialData()
+function sendSerialData(socket) 
 {
-  // read data from serial
+  // read data from UNIX socket
+  //socket.read();
+
   var data = {
         id: commander.id,
 	open: ((Math.random()+100)%2),
@@ -86,5 +96,10 @@ function sendRandomData()
   });
 }
 
-if(commander.emulated) kafkaesque.tearUp( function(){ setInterval(sendRandomData, 1000*1); });
-else kafkaesque.tearUp( function(){ setInterval(sendSerailData, 1000*1); });
+if(commander.emulated) kafkaesque.tearUp( function(){ setInterval(sendRandomData, commander.msSend); });
+else
+{
+  var socket = http.createServer();
+  socket.listen(commander.unixSocket);
+  kafkaesque.tearUp( function(){ setInterval(sendSerialData, commander.msSend, socket); });
+}
