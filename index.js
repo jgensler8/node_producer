@@ -3,7 +3,6 @@ var net = require('net');
 
 commander
   .version('0.0.1')
-  .option('-s, --unix-server [value]', 'set the UNIX server file to read from')
   .option('-i, --id [value]', 'ID for this producer')
   .option('-kh, --kafka-host [value]', 'Kafka host to connect to.')
   .option('-kp, --kafka-port [n]', 'Kafka port to cionnect to.', parseInt)
@@ -91,7 +90,9 @@ else
   
   serialPort.on('open', function()
   {
+    console.log("Serial opened...");
     kafkaesque.tearUp( function(){
+      console.log("Connected to Kafka...");
       
       var json = "";
     
@@ -108,11 +109,11 @@ else
               kafkaesque.tearDown();
             }
             // shutdown connection
-            console.log("response:", response);
+            //console.log("response:", response);
           });
           
           //also log for the user
-          console.log(json);
+          //console.log(json);
           
           //reset the json variable
           json = "";

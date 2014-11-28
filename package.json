@@ -18,6 +18,7 @@
   "homepage": "https://github.com/jgensler8/node_producer",
   "dependencies": {
     "commander": "^2.5.0",
-    "kafkaesque": "^0.1.1"
+    "kafkaesque": "^0.1.1",
+    "serialport": "^1.4.6"
   }
 }
