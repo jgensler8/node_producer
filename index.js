@@ -1,5 +1,5 @@
 var commander = require('commander');
-var http = require('http');
+var net = require('net');
 
 commander
   .version('0.0.1')
@@ -81,7 +81,7 @@ if(commander.emulated === true)
 }
 else
 {
-  var server = http.createServer(function(connection)
+  var server = net.createServer(function(connection)
   {
     console.log(request, response);
     
@@ -128,5 +128,5 @@ else
     });
     
   });
-  server.listen(commander.unixSocket);
+  server.listen(commander.unixSocket, function(){console.log("listening");});
 }
