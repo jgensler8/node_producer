@@ -116,6 +116,10 @@ else
                 });
                 
             }
+            catch(e)
+            {
+              console.log(e);
+            }
             chunk = chunk.substring(d_index+1); // Cuts off the processed chunk
             d_index = chunk.indexOf(';'); // Find the new delimiter
         }
