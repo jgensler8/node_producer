@@ -9,14 +9,17 @@ commander
   .option('-kp, --kafka-port [n]', 'Kafka port to cionnect to.', parseInt)
   .option('-e, --emulated', 'Run in emulated mode (no socket reading, random data)')
   .option('-m, --ms-send [n]', 'Send a message arg amount of milliseconds', parseInt)
+  .option('-t, --tty-buf [value]', 'set the tty buffer to read from')
+  .option('-b, --baudrate [n]', 'set the baudrate for the serial port', parseInt)
   .parse(process.argv);
 
 if(commander.id === undefined) commander.id = ((Math.random() + 10000000) % 10000000);
 if(commander.kafkaHost === undefined) commander.kafkaHost = 'kafka';
 if(commander.kafkaPort === undefined) commander.kafkaPort = 9092;
-if(!commander.emulated && commander.unixServer === undefined)
+if(commander.baudrate === undefined) commander.baudrate = 9600;
+if(!commander.emulated && commander.ttyBuf === undefined)
 {
-  console.log("ERROR: emulated set but no unixServer specified");
+  console.log("ERROR: no serial option set!");
   return -1;
 }
 if(commander.msSend === undefined) commander.msSend = 1000*1; //one second
@@ -81,57 +84,45 @@ if(commander.emulated === true)
 }
 else
 {
-  var server = net.createServer(function(connection)
+  var SerialPort = require("serialport").SerialPort
+  var serialPort = new SerialPort(commander.ttyBuf, {
+    baudrate: commander.baudrate
+  });
+  
+  serialPort.on('open', function()
   {
-    console.log(request, response);
-    
     kafkaesque.tearUp( function(){
-      var chunk = "";
       
-      connection.on('data', function(data)
-      {
-        
-        chunk += data.toString(); // Add string on the end of the variable 'chunk'
-        d_index = chunk.indexOf(';'); // Find the delimiter
+      var json = "";
     
-        // While loop to keep going until no delimiter can be found
-        while (d_index > -1) {
-            try {
-                string = chunk.substring(0,d_index); // Create string up until the delimiter
-                json = JSON.parse(string); // Parse the current string
-                
-                console.log(data);
-        
-                // send data over to kafka
-                kafkaesque.produce({topic: 'fridge', partition: 0},
-                                   [data],
-                                   function(err, response) {
-                  if(err)
-                  {
-                    console.log("err", err);
-                    kafkaesque.tearDown();
-                  }
-                  // shutdown connection
-                  console.log("response:", response);
-                });
-                
-            }
-            catch(e)
+      serialPort.on('data', function(data) {
+        if(String(data).indexOf("0000000") === 0)
+        {
+          // send data over to kafka
+          kafkaesque.produce({topic: 'fridge', partition: 0},
+                             [json],
+                             function(err, response) {
+            if(err)
             {
-              console.log(e);
+              console.log("err", err);
+              kafkaesque.tearDown();
             }
-            chunk = chunk.substring(d_index+1); // Cuts off the processed chunk
-            d_index = chunk.indexOf(';'); // Find the new delimiter
+            // shutdown connection
+            console.log("response:", response);
+          });
+          
+          //also log for the user
+          console.log(json);
+          
+          //reset the json variable
+          json = "";
         }
-        
-      });
-      
-      connection.on('err', function(err)
-      {
-        Console.log("ERROR");
+        else
+        {
+           json += data;
+        }
+        //console.log('data received: ' + data);
       });
     });
-    
   });
-  server.listen(commander.unixSocket, function(){console.log("listening");});
 }
