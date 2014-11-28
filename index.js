@@ -3,7 +3,7 @@ var http = require('http');
 
 commander
   .version('0.0.1')
-  .option('-s, --unix-socket [value]', 'set the UNIX socket to write to')
+  .option('-s, --unix-server [value]', 'set the UNIX server file to read from')
   .option('-i, --id [value]', 'ID for this producer')
   .option('-kh, --kafka-host [value]', 'Kafka host to connect to.')
   .option('-kp, --kafka-port [n]', 'Kafka port to cionnect to.', parseInt)
@@ -14,9 +14,9 @@ commander
 if(commander.id === undefined) commander.id = ((Math.random() + 10000000) % 10000000);
 if(commander.kafkaHost === undefined) commander.kafkaHost = 'kafka';
 if(commander.kafkaPort === undefined) commander.kafkaPort = 9092;
-if(!commander.emulated && commander.unixSocket === undefined)
+if(!commander.emulated && commander.unixServer === undefined)
 {
-  console.log("ERROR: emulated set but no unixSocket specified");
+  console.log("ERROR: emulated set but no unixServer specified");
   return -1;
 }
 if(commander.msSend === undefined) commander.msSend = 1000*1; //one second
@@ -27,29 +27,6 @@ var kafkaesque = require('kafkaesque')({
   clientId: "node-producer-" + commander.id,
   maxBytes: 2000000
 });
-
-function sendSerialData(socket) 
-{
-  //console.log("sending serial data");
-
-  // read data from UNIX socket
-  //socket.read();
-
-  var data = 
-
-  // send data over to kafka
-  kafkaesque.produce({topic: 'fridge', partition: 0},
-                     [JSON.stringify("data")],
-                     function(err, response) {
-    if(err)
-    {
-      console.log("err", err);
-      kafkaesque.tearDown();
-    }
-    // shutdown connection
-    console.log("response:", response);
-  });
-}
 
 function sendRandomData()
 {
@@ -95,7 +72,7 @@ if(commander.emulated === true)
   kafkaesque.metadata({topic: 'fridge'}, function(err, metadata)
   {
     if(err) console.log("ERROR", err);
-    else console.log("metadata:", metadata); 
+    else console.log("metadata:", metadata);
   });
 
   setInterval(sendRandomData, commander.msSend);
@@ -104,7 +81,48 @@ if(commander.emulated === true)
 }
 else
 {
-  var socket = http.createServer();
-  socket.listen(commander.unixSocket);
-  kafkaesque.tearUp( function(){ setInterval(sendSerialData, commander.msSend, socket); });
+  var server = http.createServer(function(request, response)
+  {
+    console.log(request, response);
+    
+    kafkaesque.tearUp( function(){
+      var chunk = "";
+      
+      server.on('data', function(data)
+      {
+        
+        chunk += data.toString(); // Add string on the end of the variable 'chunk'
+        d_index = chunk.indexOf(';'); // Find the delimiter
+    
+        // While loop to keep going until no delimiter can be found
+        while (d_index > -1) {
+            try {
+                string = chunk.substring(0,d_index); // Create string up until the delimiter
+                json = JSON.parse(string); // Parse the current string
+                
+                console.log(data);
+        
+                // send data over to kafka
+                kafkaesque.produce({topic: 'fridge', partition: 0},
+                                   [data],
+                                   function(err, response) {
+                  if(err)
+                  {
+                    console.log("err", err);
+                    kafkaesque.tearDown();
+                  }
+                  // shutdown connection
+                  console.log("response:", response);
+                });
+                
+            }
+            chunk = chunk.substring(d_index+1); // Cuts off the processed chunk
+            d_index = chunk.indexOf(';'); // Find the new delimiter
+        }
+        
+      });
+    });
+    
+  });
+  server.listen(commander.unixSocket);
 }
