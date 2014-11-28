@@ -70,16 +70,16 @@ function sendRandomData()
   // read data from serial
   var data = {
         id: commander.id,
-        open: ((Math.random()+100)%2),
-        temp: ((Math.random()+100) % 100),
+        open: Math.floor((Math.random()+100)%2),
+        temp: Math.floor((Math.random()+100) % 100),
         dispensers:
         {
-          "0": ((Math.random()+100)%2),
-          "1": ((Math.random()+100)%2),
-          "2": ((Math.random()+100)%2),
-          "3": ((Math.random()+100)%2),
-          "4": ((Math.random()+100)%2),
-          "5": ((Math.random()+100)%2)
+          "0": Math.floor((Math.random()+100)%2),
+          "1": Math.floor((Math.random()+100)%2),
+          "2": Math.floor((Math.random()+100)%2),
+          "3": Math.floor((Math.random()+100)%2),
+          "4": Math.floor((Math.random()+100)%2),
+          "5": Math.floor((Math.random()+100)%2)
         }
   };
 
