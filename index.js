@@ -81,14 +81,14 @@ if(commander.emulated === true)
 }
 else
 {
-  var server = http.createServer(function(request, response)
+  var server = http.createServer(function(connection)
   {
     console.log(request, response);
     
     kafkaesque.tearUp( function(){
       var chunk = "";
       
-      server.on('data', function(data)
+      connection.on('data', function(data)
       {
         
         chunk += data.toString(); // Add string on the end of the variable 'chunk'
