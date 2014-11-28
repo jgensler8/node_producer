@@ -30,25 +30,12 @@ var kafkaesque = require('kafkaesque')({
 
 function sendSerialData(socket) 
 {
-  console.log("sending serial data");
+  //console.log("sending serial data");
 
   // read data from UNIX socket
   //socket.read();
 
-  var data = {
-        id: commander.id,
-	open: ((Math.random()+100)%2),
-	temp: ((Math.random()+100) % 100),
-        dispensers:
-        {
-          "0": ((Math.random()+100)%2),
-          "1": ((Math.random()+100)%2),
-          "2": ((Math.random()+100)%2),
-          "3": ((Math.random()+100)%2),
-          "4": ((Math.random()+100)%2),
-          "5": ((Math.random()+100)%2)
-        }
-  };
+  var data = 
 
   // send data over to kafka
   kafkaesque.produce({topic: 'fridge', partition: 0},
@@ -66,20 +53,21 @@ function sendSerialData(socket)
 
 function sendRandomData()
 {
-  console.log("sending random data");
+  //console.log("sending random data");
+
   // read data from serial
   var data = {
         id: commander.id,
-        open: Math.floor((Math.random()+100)%2),
-        temp: Math.floor((Math.random()+100) % 100),
+        open: Math.floor((Math.random()*10)%2),
+        temp: Math.floor((Math.random()*10) % 100),
         dispensers:
         {
-          "0": Math.floor((Math.random()+100)%2),
-          "1": Math.floor((Math.random()+100)%2),
-          "2": Math.floor((Math.random()+100)%2),
-          "3": Math.floor((Math.random()+100)%2),
-          "4": Math.floor((Math.random()+100)%2),
-          "5": Math.floor((Math.random()+100)%2)
+          "0": Math.floor((Math.random()*10)%2),
+          "1": Math.floor((Math.random()*10)%2),
+          "2": Math.floor((Math.random()*10)%2),
+          "3": Math.floor((Math.random()*10)%2),
+          "4": Math.floor((Math.random()*10)%2),
+          "5": Math.floor((Math.random()*10)%2)
         }
   };
 
@@ -93,7 +81,7 @@ function sendRandomData()
       console.log("err", err);
       kafkaesque.tearDown();
     }
-    console.log("response:", response);
+    //console.log("response:", response);
   });
 }
 
@@ -104,19 +92,12 @@ if(commander.emulated === true)
   // send data over to kafka
   kafkaesque.tearUp(function(){
 
-/*
-  kafkaesque.produce({topic: 'fridge', partition: 0},
-                     ["hello world"],
-                     function(err, response) {
-
-    if(err)
-    {
-      console.log("err", err);
-      kafkaesque.tearDown();
-    }
-    console.log("response:", response);
+  kafkaesque.metadata({topic: 'fridge'}, function(err, metadata)
+  {
+    if(err) console.log("ERROR", err);
+    else console.log("metadata:", metadata); 
   });
-*/
+
   setInterval(sendRandomData, commander.msSend);
 
   });
