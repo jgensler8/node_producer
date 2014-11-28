@@ -125,6 +125,11 @@ else
         }
         
       });
+      
+      connection.on('err', function(err)
+      {
+        Console.log("ERROR");
+      });
     });
     
   });
