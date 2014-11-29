@@ -100,7 +100,7 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
       var json = "";
     
       serialPort.on('data', function(data) {
-        if(String(data).indexOf("  ") === 0)
+        if(String(data).indexOf("     ") === 0)
         {
 
           try{
@@ -127,7 +127,7 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
             });
           
             //also log for the user
-            console.log(JSON.stringify(message));
+            //console.log(JSON.stringify(message));
           }
           catch(e)
           {
