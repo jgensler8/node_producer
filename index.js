@@ -118,7 +118,7 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
           });
           
           //also log for the user
-          console.log(data);
+          //console.log(data);
           
           //reset the json variable
           json = "";
