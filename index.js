@@ -107,7 +107,7 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
 
             // send data over to kafka
             kafkaesque.produce({topic: 'fridge', partition: 0},
-                               [data.toString()],
+                               [JSON.stringify(data)],
                                function(err, response) {
               if(err)
               {
