@@ -37,9 +37,9 @@ function sendRandomData()
   // read data from serial
   var data = {
         id: commander.id,
-        open: Math.floor((Math.random()*10)%2),
-        temp: Math.floor((Math.random()*10) % 100),
-        dispensers:
+        o: Math.floor((Math.random()*10)%2),
+        t: Math.floor((Math.random()*10) % 100),
+        d:
         {
           "0": Math.floor((Math.random()*10)%2),
           "1": Math.floor((Math.random()*10)%2),
@@ -102,12 +102,20 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
       serialPort.on('data', function(data) {
         if(String(data).indexOf("  ") === 0)
         {
+
           try{
             var data = JSON.parse(json);
 
+            var message = {
+              id: commander.id,
+              o: data.o,
+              d: data.d,
+              t: data.t
+             };
+      
             // send data over to kafka
             kafkaesque.produce({topic: 'fridge', partition: 0},
-                               [JSON.stringify(data)],
+                               [JSON.stringify(message)],
                                function(err, response) {
               if(err)
               {
@@ -119,7 +127,7 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
             });
           
             //also log for the user
-            //console.log(data);
+            console.log(JSON.stringify(message));
           }
           catch(e)
           {
