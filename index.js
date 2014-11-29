@@ -100,25 +100,31 @@ kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, dat
       var json = "";
     
       serialPort.on('data', function(data) {
-        if(String(data).indexOf("       ") === 0)
+        if(String(data).indexOf("  ") === 0)
         {
-          var data = JSON.parse(json);
+          try{
+            var data = JSON.parse(json);
 
-          // send data over to kafka
-          kafkaesque.produce({topic: 'fridge', partition: 0},
-                             [data.toString()],
-                             function(err, response) {
-            if(err)
-            {
-              console.log("err", err);
-              kafkaesque.tearDown();
-            }
-            // shutdown connection
-            //console.log("response:", response);
-          });
+            // send data over to kafka
+            kafkaesque.produce({topic: 'fridge', partition: 0},
+                               [data.toString()],
+                               function(err, response) {
+              if(err)
+              {
+                console.log("err", err);
+                kafkaesque.tearDown();
+              }
+              // shutdown connection
+              //console.log("response:", response);
+            });
           
-          //also log for the user
-          //console.log(data);
+            //also log for the user
+            //console.log(data);
+          }
+          catch(e)
+          {
+            console.log(e);
+          }
           
           //reset the json variable
           json = "";
