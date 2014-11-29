@@ -92,16 +92,21 @@ else
   {
     console.log("Serial opened...");
     kafkaesque.tearUp( function(){
+
+kafkaesque.metadata({topic: "fridge"}, function(err, data){ console.log(err, data);});
+
       console.log("Connected to Kafka...");
       
       var json = "";
     
       serialPort.on('data', function(data) {
-        if(String(data).indexOf("0000000") === 0)
+        if(String(data).indexOf("       ") === 0)
         {
+          var data = JSON.parse(json);
+
           // send data over to kafka
           kafkaesque.produce({topic: 'fridge', partition: 0},
-                             [json],
+                             [data.toString()],
                              function(err, response) {
             if(err)
             {
@@ -113,7 +118,7 @@ else
           });
           
           //also log for the user
-          //console.log(json);
+          console.log(data);
           
           //reset the json variable
           json = "";
